@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.lang.*;
@@ -15,107 +16,105 @@ public class Main {
 
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        String inputString;
-        CSS[] p = new CSS[50];
 
-        System.out.println("输入文法");
-        G=scanner.next();
-        System.out.println("输入非终结符Vn(第一个为开始符号)");
-        String vnss = scanner.next();
-        String[] vns = vnss.trim().split(",");
-        char vn[] = new char[vns.length];
-        for(int i=0;i<vns.length;i++)
-        {
-            vn[i]=vns[i].charAt(0);
-        }
+        try {
+            File file=null;
+            BufferedReader bf=null;
 
+            file=new File("E://1.txt");
+            bf=new BufferedReader(new InputStreamReader(new FileInputStream(file), "GBK"));
 
+            String inputString;
+            CSS[] p = new CSS[50];
 
-
-
-        ArrayList<String> inputStr=new ArrayList<String>();
-
-        System.out.println("输入产生式");
-        for (int k = 0; k < p.length; k++) {
-            inputString = scanner.next();
-
-            String[] LAR;
-            if(inputString.trim().equals("end"))
-            {
-                scanner.close();
-                break;
+            System.out.println("输入文法");
+            G = bf.readLine();
+            System.out.println("输入非终结符Vn(第一个为开始符号)");
+            String vnss = bf.readLine();
+            String[] vns = vnss.trim().split(",");
+            char vn[] = new char[vns.length];
+            for (int i = 0; i < vns.length; i++) {
+                vn[i] = vns[i].charAt(0);
             }
-            else
-            {
-                inputStr.add(inputString);
-                if(inputString.contains("->"))
-                {
-                    LAR = inputString.trim().split("->");
-                    if(!LAR[1].contains("|"))
-                    {
-                        p[count++] = new CSS(LAR[0],LAR[1]);
-                        char[] ctmp=LAR[0].toCharArray();
-                        for(int i=0;i<ctmp.length;i++)
-                        {
-                            setVt.add(ctmp[i]+"");
-                        }
-                        char[] ctmp2=LAR[1].toCharArray();
-                        for(int i=0;i<ctmp2.length;i++)
-                        {
-                            setVt.add(ctmp2[i]+"");
-                        }
 
-                    }
-                    else {
-                        //判断有几个“|”
-                        String str = LAR[1].replace("|","");
-                        int times = LAR[1].length()-str.length();//出现了times次“|”
-                        String[] RS = LAR[1].split("|");
-                        for(int i = 0 ; i < times + 1 ; i++)
-                        {
-                            p[count++] = new CSS(LAR[0],RS[i]);
-                        }
-                        char[] ctmp=LAR[0].toCharArray();
-                        for(int i=0;i<ctmp.length;i++)
-                        {
-                            setVt.add(ctmp[i]+"");
-                        }
+            ArrayList<String> inputStr = new ArrayList<String>();
 
-                        char[] ctmp2=str.toCharArray();
-                        for(int i=0;i<ctmp2.length;i++)
-                        {
-                            setVt.add(ctmp2[i]+"");
+            System.out.println("输入产生式");
+            for (int k = 0; k < p.length; k++) {
+                inputString = bf.readLine();
+
+                String[] LAR;
+                if (inputString.trim().equals("end")) {
+                    bf.close();
+                    break;
+                } else {
+                    inputStr.add(inputString);
+                    if (inputString.contains("::=")) {
+                        LAR = inputString.trim().split("::=");
+                        if (!LAR[1].contains("|")) {
+                            p[count++] = new CSS(LAR[0], LAR[1]);
+                            char[] ctmp = LAR[0].toCharArray();
+                            for (int i = 0; i < ctmp.length; i++) {
+                                setVt.add(ctmp[i] + "");
+                            }
+                            char[] ctmp2 = LAR[1].toCharArray();
+                            for (int i = 0; i < ctmp2.length; i++) {
+                                setVt.add(ctmp2[i] + "");
+                            }
+
+                        } else {
+                            //判断有几个“|”
+                            String str = LAR[1].replace("|", "");
+                            int times = LAR[1].length() - str.length();//出现了times次“|”
+                            String[] RS = LAR[1].split("|");
+                            for (int i = 0; i < times + 1; i++) {
+                                p[count++] = new CSS(LAR[0], RS[i]);
+                            }
+                            char[] ctmp = LAR[0].toCharArray();
+                            for (int i = 0; i < ctmp.length; i++) {
+                                setVt.add(ctmp[i] + "");
+                            }
+
+                            char[] ctmp2 = str.toCharArray();
+                            for (int i = 0; i < ctmp2.length; i++) {
+                                setVt.add(ctmp2[i] + "");
+                            }
+
+
                         }
-
-
                     }
                 }
             }
+            for(String str : vns)
+            {
+                setVt.remove(str);
+            }
+
+
+
+            bf.close();
+
+            System.out.print("文法" + G + "=" + "({" + vnss + "},{");
+            for(String str : setVt)
+            {
+                if(!str.equals("ε"))
+                    System.out.print(str+" ");
+            }
+            System.out.println("},P,"+ vns[0] +")");
+
+            System.out.println("P:");
+            for(String str : inputStr)
+            {
+                System.out.println(str);
+            }
+            Third(p);
+
+        }catch (Exception e){
+            System.out.println("发生异常！");
+            e.printStackTrace();
         }
 
-        for(String str : vns)
-        {
-            setVt.remove(str);
-        }
 
-
-        scanner.close();
-
-        System.out.print("文法" + G + "=" + "({" + vnss + "},{");
-        for(String str : setVt)
-        {
-            if(!str.equals("ε"))
-                System.out.print(str+" ");
-        }
-        System.out.println("},P,"+ vns[0] +")");
-
-        System.out.println("P:");
-        for(String str : inputStr)
-        {
-            System.out.println(str);
-        }
-        Third(p);
 
     }
 
@@ -159,9 +158,9 @@ public class Main {
 
     public static boolean Second(CSS[] p) {
         int i;
-        if (First(p)) // 同上，先判断低级文法是否成立
+        if (First(p))
         {
-            for (i = 0; i < count; i++) // 同上，遍历所有文法产生式
+            for (i = 0; i < count; i++)
             {
                 if ((p[i].left.length() != 1)
                         || !(p[i].left.charAt(0) >= 'A' && p[i].left.charAt(0) <= 'Z'))
@@ -170,7 +169,10 @@ public class Main {
             if (i == count)
                 return true;
             else {
-                System.out.println("1型文法");
+                if(!setVt.contains("ε"))
+                    System.out.println("该文法属于1型文法");
+                else
+                    System.out.println("该文法属于0型文法");
                 return false;
             }
         } else
@@ -181,9 +183,9 @@ public class Main {
     public static void Third(CSS[] p) // 判断3型文法
     {
         int i;
-        if (Second(p)) // 同上，先判断是否是2型文法
+        if (Second(p)) // 先判断是否是2型文法
         {
-            for (i = 0; i < count; i++) // 同上，遍历文法所有的产生式
+            for (i = 0; i < count; i++)
             {
                 if ((p[i].right.length() == 0)
                         || (p[i].right.length() >= 3)
